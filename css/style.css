@@ -155,13 +155,26 @@ h1, h2, h3, h4 {
   gap: 2rem;
 }
 
-.site-header.scrolled {
+/* scrolled background lives on a pseudo-element: backdrop-filter on the header
+   itself would turn it into the containing block for the fixed mobile menu */
+.site-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: rgba(255, 253, 252, 0.94);
-  backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  transition: opacity 0.45s var(--ease);
+}
+
+.site-header.scrolled {
   box-shadow: 0 1px 0 var(--line);
   padding: 0.8rem 0;
 }
+
+.site-header.scrolled::after { opacity: 1; }
 
 .brand { display: flex; align-items: center; gap: 0.8rem; }
 
@@ -1319,6 +1332,7 @@ h1, h2, h3, h4 {
   .plans-grid { grid-template-columns: 1fr; max-width: 500px; margin-inline: auto; }
   .plan.featured { order: -1; }
   .include-grid { grid-template-columns: repeat(2, 1fr); }
+  .blog-grid { grid-template-columns: repeat(2, 1fr); }
   .plan-meta { grid-template-columns: repeat(2, 1fr); }
   .plan-meta-item:nth-child(n+3) { border-top: 1px solid var(--line); }
   .plan-meta-item:nth-child(3) { border-inline-start: none; }
@@ -1339,6 +1353,7 @@ h1, h2, h3, h4 {
   .venue-gallery { grid-template-columns: 1fr 1fr; }
   .contact-form .row { grid-template-columns: 1fr; }
   .include-grid { grid-template-columns: 1fr; }
+  .blog-grid { grid-template-columns: 1fr; }
 }
 
 /* ---------- reduced motion ---------- */
