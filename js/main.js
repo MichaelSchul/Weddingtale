@@ -43,24 +43,34 @@
     }, 5500);
   }
 
-  // scroll reveal
-  const revealEls = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in");
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
-    );
-    revealEls.forEach((el) => io.observe(el));
-  } else {
-    revealEls.forEach((el) => el.classList.add("in"));
-  }
+  // scroll reveal — rect-based so it works in every environment (incl. emulated mobile)
+  const revealEls = Array.from(document.querySelectorAll(".reveal"));
+  let pending = revealEls.slice();
+  let ticking = false;
+
+  const revealCheck = () => {
+    ticking = false;
+    const vh = window.innerHeight;
+    pending = pending.filter((el) => {
+      if (el.getBoundingClientRect().top < vh - 40) {
+        el.classList.add("in");
+        return false;
+      }
+      return true;
+    });
+  };
+
+  const onRevealScroll = () => {
+    if (!ticking && pending.length) {
+      ticking = true;
+      requestAnimationFrame(revealCheck);
+    }
+  };
+
+  window.addEventListener("scroll", onRevealScroll, { passive: true });
+  window.addEventListener("resize", onRevealScroll, { passive: true });
+  revealCheck();
+  setTimeout(revealCheck, 400);
 
   // lightbox
   const lightbox = document.querySelector(".lightbox");
